@@ -49,6 +49,20 @@ int round2(char* dbname)
     if(result==SUCCESS)
         printf("%d\n%s\n%s\n",cptr1->course_number,cptr1->course_name,cptr1->instructor);
     else if(result==REC_NOT_FOUND) printf("Record not found in get\n");
+    result = get_coursedb(cptr,3);
+    if(result==SUCCESS)
+        printf("%d\n%s\n%s\n",cptr->course_number,cptr->course_name,cptr->instructor);
+    if(result==REC_NOT_FOUND) printf("Record not found in first get\n");
+    cptr->course_number=3;
+    strcpy(cptr->course_name,"la");
+    strcpy(cptr->instructor,"manisha");
+    result = update_coursedb(cptr,3);
+    if(result==REC_NOT_FOUND) printf("Record not found in update\n");
+    cptr1 = malloc(sizeof(struct Course));
+    result = get_coursedb(cptr1,3);
+    if(result==SUCCESS)
+        printf("%d\n%s\n%s\n",cptr1->course_number,cptr1->course_name,cptr1->instructor);
+    else if(result==REC_NOT_FOUND) printf("Record not found in get\n");
     return close_coursedb(dbname);
 }
 int main()
