@@ -13,28 +13,39 @@ int round1(char* dbname)
     strcpy(course1->course_name,"dsa");
     strcpy(course1->instructor,"murali");
     store_coursedb(course1,1);
-    for(int i=0;i<cdb_info.rec_count;i++)
-    {
-        printf("key is: %ld\n and location is: %ld\n",
-        cdb_info.indexarr[i].key,cdb_info.indexarr[i].loc);
-    }
+    course1->course_number=2;
+    strcpy(course1->course_name,"ca");
+    strcpy(course1->instructor,"karthikeyan");
+    store_coursedb(course1,2);
+    course1->course_number=3;
+    strcpy(course1->course_name,"cn");
+    strcpy(course1->instructor,"bakre");
+    store_coursedb(course1,3);
+    course1->course_number=4;
+    strcpy(course1->course_name,"calculus");
+    strcpy(course1->instructor,"jaya");
+    store_coursedb(course1,4);
+    course1->course_number=5;
+    strcpy(course1->course_name,"prob");
+    strcpy(course1->instructor,"chatto");
+    store_coursedb(course1,5);
     close_coursedb(dbname);
 }
 int round2(char* dbname)
 {
     open_coursedb(dbname);
     struct Course* cptr = malloc(sizeof(struct Course));
-    int result = get_coursedb(cptr,1);
+    int result = get_coursedb(cptr,4);
     if(result==SUCCESS)
         printf("%d\n%s\n%s\n",cptr->course_number,cptr->course_name,cptr->instructor);
     if(result==REC_NOT_FOUND) printf("Record not found in first get\n");
-    cptr->course_number=1;
+    cptr->course_number=4;
     strcpy(cptr->course_name,"os");
     strcpy(cptr->instructor,"badri");
-    result = update_coursedb(cptr,1);
+    result = update_coursedb(cptr,4);
     if(result==REC_NOT_FOUND) printf("Record not found in update\n");
     struct Course* cptr1 = malloc(sizeof(struct Course));
-    result = get_coursedb(cptr1,1);
+    result = get_coursedb(cptr1,4);
     if(result==SUCCESS)
         printf("%d\n%s\n%s\n",cptr1->course_number,cptr1->course_name,cptr1->instructor);
     else if(result==REC_NOT_FOUND) printf("Record not found in get\n");
@@ -42,7 +53,11 @@ int round2(char* dbname)
 }
 int main()
 {
-    char* db = "hanish";
-    printf("The result of round is: %d\n",round2(db));
+    char* db = "penumarti";
+    printf("Enter round:\n");
+    int n;
+    scanf("%d",&n);
+    if (n==1)      round1(db);
+    else if (n==2) round2(db);
     return 0;
 }

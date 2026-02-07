@@ -28,14 +28,8 @@ struct CoursedbInfo
 extern struct CoursedbInfo cdb_info;
 void coursedb_init();
 int create_coursedb(char * dbname);
-//fopen in wb mode and then immediately fclose it
 int open_coursedb(char* dbname);
-//fopen in rb+
 int store_coursedb(struct Course* c, int key);
-//fseek to EOF and then fwrite
 int get_coursedb(struct Course* coutput, int course_number);
-//return 0 if found and 1 if not
 int update_coursedb(struct Course* new, int course_number);
-//fseek to beginning and then iterate over each record until course number matches
 int close_coursedb(char* dbname);
-//fclose

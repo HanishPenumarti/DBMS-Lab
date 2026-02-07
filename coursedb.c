@@ -22,7 +22,7 @@ int create_coursedb(char * dbname)
     int result;
     cdb_info.dbfile = fopen(arr1,"wb");
     cdb_info.indexfile = fopen(arr2,"wb");
-    if(!(cdb_info.dbfile!=NULL && cdb_info.indexfile!=NULL)) return FAILURE;
+    if(!cdb_info.dbfile || !cdb_info.indexfile) return FAILURE;
     int nr = 0;
     fwrite(&nr,sizeof(int),1,cdb_info.indexfile);
     strcpy(cdb_info.dbname,dbname);
@@ -31,7 +31,6 @@ int create_coursedb(char * dbname)
     return SUCCESS;
 
 }
-//if it is open, don't open again
 int open_coursedb(char* dbname)
 {
     char arr1[50];
@@ -42,7 +41,7 @@ int open_coursedb(char* dbname)
     strcat(arr2,".ndx");
     cdb_info.dbfile = fopen(arr1,"rb+");
     cdb_info.indexfile = fopen(arr2,"rb+");
-    if(!(cdb_info.dbfile!=NULL && cdb_info.indexfile!=NULL)) return FAILURE;
+    if(!cdb_info.dbfile || !cdb_info.indexfile) return FAILURE;
     fread(&cdb_info.rec_count,sizeof(int),1,cdb_info.indexfile);
     fread(cdb_info.indexarr,sizeof(struct Course_Ndx),cdb_info.rec_count,cdb_info.indexfile);
     fclose(cdb_info.indexfile);
@@ -77,11 +76,12 @@ int get_coursedb(struct Course* coutput, int course_number)
     int num = 0;
     fread(&num,sizeof(int),1,cdb_info.dbfile);
     fread(coutput,sizeof(struct Course),1,cdb_info.dbfile);
-    if(num==coutput->course_number) return SUCCESS;   
+    if(num==coutput->course_number) return SUCCESS;
+    return FAILURE; 
 }
 int update_coursedb(struct Course* new, int course_number)
 {
-    long int reqLoc = -1000;
+    long int reqLoc = -1;
     for(int i=0;i<cdb_info.rec_count;i++)
     {
         if(cdb_info.indexarr[i].key==course_number)
@@ -90,7 +90,7 @@ int update_coursedb(struct Course* new, int course_number)
             break;
         }
     }
-    if(reqLoc == -1000) return REC_NOT_FOUND;
+    if(reqLoc == -1) return REC_NOT_FOUND;
     fseek(cdb_info.dbfile,reqLoc,SEEK_SET);
     int num = course_number;
     fwrite(&num,sizeof(int),1,cdb_info.dbfile);
