@@ -47,7 +47,7 @@ int open_coursedb(char* dbname)
     fclose(cdb_info.indexfile);
     return SUCCESS;
 }
-int store_coursedb(struct Course* c, int key)
+int store_coursedb(int key,struct Course* c)
 {
     if(cdb_info.rec_count==MAX) return FAILURE;
     fseek(cdb_info.dbfile,0,SEEK_END);
@@ -60,12 +60,12 @@ int store_coursedb(struct Course* c, int key)
     fwrite(c,sizeof(struct Course),1,cdb_info.dbfile);
     return SUCCESS;
 }
-int get_coursedb(struct Course* coutput, int course_number)
+int get_coursedb(int course_num,struct Course* coutput)
 {
     long int reqLoc = -1;
     for(int i=0;i<cdb_info.rec_count;i++)
     {
-        if(cdb_info.indexarr[i].key==course_number)
+        if(cdb_info.indexarr[i].key==course_num)
         {
             reqLoc = cdb_info.indexarr[i].loc;
             break;
@@ -76,15 +76,15 @@ int get_coursedb(struct Course* coutput, int course_number)
     int num = 0;
     fread(&num,sizeof(int),1,cdb_info.dbfile);
     fread(coutput,sizeof(struct Course),1,cdb_info.dbfile);
-    if(num==coutput->course_number) return SUCCESS;
+    if(num==coutput->course_num) return SUCCESS;
     return FAILURE; 
 }
-int update_coursedb(struct Course* new, int course_number)
+int update_coursedb(int course_num,struct Course* new)
 {
     long int reqLoc = -1;
     for(int i=0;i<cdb_info.rec_count;i++)
     {
-        if(cdb_info.indexarr[i].key==course_number)
+        if(cdb_info.indexarr[i].key==course_num)
         {
             reqLoc = cdb_info.indexarr[i].loc;
             break;
@@ -92,17 +92,17 @@ int update_coursedb(struct Course* new, int course_number)
     }
     if(reqLoc == -1) return REC_NOT_FOUND;
     fseek(cdb_info.dbfile,reqLoc,SEEK_SET);
-    int num = course_number;
+    int num = course_num;
     fwrite(&num,sizeof(int),1,cdb_info.dbfile);
     fwrite(new,sizeof(struct Course),1,cdb_info.dbfile);
     return SUCCESS;
 }
-int close_coursedb(char* dbname)
+int close_coursedb()
 {
     char arr2[50];
-    strcpy(arr2,dbname);
+    strcpy(arr2,cdb_info.dbname);
     strcat(arr2,".ndx");
-    cdb_info.indexfile = fopen(arr2,"rb+");
+    cdb_info.indexfile = fopen(arr2,"wb");
     fwrite(&cdb_info.rec_count,sizeof(int),1,cdb_info.indexfile);
     fwrite(cdb_info.indexarr,sizeof(struct Course_Ndx),cdb_info.rec_count,cdb_info.indexfile);
     fclose(cdb_info.indexfile);

@@ -7,7 +7,7 @@
 #define REC_NOT_FOUND 1
 struct Course
 {
-    int course_number;
+    int course_num;
     char course_name[50];
     char instructor[50];
 };
@@ -29,7 +29,7 @@ extern struct CoursedbInfo cdb_info;
 void coursedb_init();
 int create_coursedb(char * dbname);
 int open_coursedb(char* dbname);
-int store_coursedb(struct Course* c, int key);
-int get_coursedb(struct Course* coutput, int course_number);
-int update_coursedb(struct Course* new, int course_number);
-int close_coursedb(char* dbname);
+int store_coursedb(int key, struct Course* c);
+int get_coursedb(int course_num,struct Course* coutput);
+int update_coursedb(int course_num,struct Course* new);
+int close_coursedb();
