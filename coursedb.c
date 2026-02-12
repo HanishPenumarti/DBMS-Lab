@@ -8,7 +8,7 @@ void coursedb_init()
 {
     cdb_info.dbfile=NULL;
     strcpy(cdb_info.dbname,"");
-    cdb_info.status=0;
+    cdb_info.status=CLOSED;
     cdb_info.rec_count=0;
 }
 int create_coursedb(char * dbname)

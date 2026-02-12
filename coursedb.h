@@ -22,7 +22,7 @@ struct CoursedbInfo
 {
     FILE* dbfile;
     FILE* indexfile;
-    struct Course_Ndx indexarr[1000];
+    struct Course_Ndx indexarr[MAX];
     int rec_count;
     char dbname[50];
     int status;
