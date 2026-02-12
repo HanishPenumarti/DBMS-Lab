@@ -39,8 +39,12 @@ int open_coursedb(char* dbname)
     strcpy(arr2,dbname);
     strcat(arr1,".dat");
     strcat(arr2,".ndx");
-    cdb_info.dbfile = fopen(arr1,"rb+");
     cdb_info.indexfile = fopen(arr2,"rb+");
+    if(cdb_info.status==CLOSED)
+    {
+        cdb_info.dbfile = fopen(arr1,"rb+");
+        cdb_info.status=OPEN;
+    }
     if(!cdb_info.dbfile || !cdb_info.indexfile) return FAILURE;
     fread(&cdb_info.rec_count,sizeof(int),1,cdb_info.indexfile);
     fread(cdb_info.indexarr,sizeof(struct Course_Ndx),cdb_info.rec_count,cdb_info.indexfile);
@@ -49,53 +53,68 @@ int open_coursedb(char* dbname)
 }
 int store_coursedb(int key,struct Course* c)
 {
-    if(cdb_info.rec_count==MAX) return FAILURE;
-    fseek(cdb_info.dbfile,0,SEEK_END);
-    long int loc = ftell(cdb_info.dbfile);
-    struct Course_Ndx temp = {key,loc};
-    cdb_info.indexarr[cdb_info.rec_count] = temp;
-    cdb_info.rec_count++;
-    int num = key;
-    fwrite(&num,sizeof(int),1,cdb_info.dbfile);
-    fwrite(c,sizeof(struct Course),1,cdb_info.dbfile);
-    return SUCCESS;
+    if(cdb_info.status==OPEN)
+    {
+        if(cdb_info.rec_count==MAX)
+        {
+            printf("The database is full\n");
+            return FAILURE;
+        }
+        fseek(cdb_info.dbfile,0,SEEK_END);
+        long int loc = ftell(cdb_info.dbfile);
+        struct Course_Ndx temp = {key,loc};
+        cdb_info.indexarr[cdb_info.rec_count] = temp;
+        cdb_info.rec_count++;
+        int num = key;
+        fwrite(&num,sizeof(int),1,cdb_info.dbfile);
+        fwrite(c,sizeof(struct Course),1,cdb_info.dbfile);
+        return SUCCESS;
+    }
+    return FAILURE;
 }
 int get_coursedb(int course_num,struct Course* coutput)
 {
-    long int reqLoc = -1;
-    for(int i=0;i<cdb_info.rec_count;i++)
+    if(cdb_info.status==OPEN)
     {
-        if(cdb_info.indexarr[i].key==course_num)
+        long int reqLoc = -1;
+        for(int i=0;i<cdb_info.rec_count;i++)
         {
-            reqLoc = cdb_info.indexarr[i].loc;
-            break;
+            if(cdb_info.indexarr[i].key==course_num)
+            {
+                reqLoc = cdb_info.indexarr[i].loc;
+                break;
+            }
         }
+        if(reqLoc == -1) return REC_NOT_FOUND;
+        fseek(cdb_info.dbfile,reqLoc,SEEK_SET);
+        int num = 0;
+        fread(&num,sizeof(int),1,cdb_info.dbfile);
+        fread(coutput,sizeof(struct Course),1,cdb_info.dbfile);
+        if(num==coutput->course_num) return SUCCESS;
     }
-    if(reqLoc == -1) return REC_NOT_FOUND;
-    fseek(cdb_info.dbfile,reqLoc,SEEK_SET);
-    int num = 0;
-    fread(&num,sizeof(int),1,cdb_info.dbfile);
-    fread(coutput,sizeof(struct Course),1,cdb_info.dbfile);
-    if(num==coutput->course_num) return SUCCESS;
-    return FAILURE; 
+    return FAILURE;
 }
 int update_coursedb(int course_num,struct Course* new)
 {
-    long int reqLoc = -1;
-    for(int i=0;i<cdb_info.rec_count;i++)
+    if(cdb_info.status==OPEN)
     {
-        if(cdb_info.indexarr[i].key==course_num)
+        long int reqLoc = -1;
+        for(int i=0;i<cdb_info.rec_count;i++)
         {
-            reqLoc = cdb_info.indexarr[i].loc;
-            break;
+            if(cdb_info.indexarr[i].key==course_num)
+            {
+                reqLoc = cdb_info.indexarr[i].loc;
+                break;
+            }
         }
+        if(reqLoc == -1) return REC_NOT_FOUND;
+        fseek(cdb_info.dbfile,reqLoc,SEEK_SET);
+        int num = course_num;
+        fwrite(&num,sizeof(int),1,cdb_info.dbfile);
+        fwrite(new,sizeof(struct Course),1,cdb_info.dbfile);
+        return SUCCESS;
     }
-    if(reqLoc == -1) return REC_NOT_FOUND;
-    fseek(cdb_info.dbfile,reqLoc,SEEK_SET);
-    int num = course_num;
-    fwrite(&num,sizeof(int),1,cdb_info.dbfile);
-    fwrite(new,sizeof(struct Course),1,cdb_info.dbfile);
-    return SUCCESS;
+    return FAILURE;
 }
 int close_coursedb()
 {
@@ -107,4 +126,5 @@ int close_coursedb()
     fwrite(cdb_info.indexarr,sizeof(struct Course_Ndx),cdb_info.rec_count,cdb_info.indexfile);
     fclose(cdb_info.indexfile);
     fclose(cdb_info.dbfile);
+    cdb_info.status=CLOSED;
 }

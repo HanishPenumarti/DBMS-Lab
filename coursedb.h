@@ -5,6 +5,8 @@
 #define FAILURE -1
 #define MAX 1000
 #define REC_NOT_FOUND 1
+#define OPEN 1
+#define CLOSED 0
 struct Course
 {
     int course_num;
