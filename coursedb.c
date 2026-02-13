@@ -28,6 +28,7 @@ int create_coursedb(char * dbname)
     strcpy(cdb_info.dbname,dbname);
     fclose(cdb_info.dbfile);
     fclose(cdb_info.indexfile);
+    cdb_info.status=CLOSED;
     return SUCCESS;
 
 }
@@ -131,6 +132,25 @@ int delete_coursedb(int course_num)
             }
         }
         if(found) return SUCCESS;
+    }
+    return FAILURE;
+}
+int undelete_coursedb(int course_num)
+{
+    if(cdb_info.status==OPEN)
+    {
+        int found = 0;
+        for(int i=0;i<cdb_info.rec_count;i++)
+        {
+            if(cdb_info.indexarr[i].old_key==course_num && cdb_info.indexarr[i].key==-1)
+            {
+                found = 1;
+                cdb_info.indexarr[i].is_deleted = NOT_DELETED;
+                cdb_info.indexarr[i].key = course_num;
+            }
+        }
+        if(!found) return REC_NOT_FOUND;
+        return SUCCESS;
     }
     return FAILURE;
 }
