@@ -62,6 +62,11 @@ int update_course(int key, Course* course)
 	return update_coursedb(key, course); // Replace with your function 
 }
 
+int delete_course(int key)
+{
+	return delete_coursedb(key); // Replace with your function 
+}
+
 int pds_close()
 {
 	return close_coursedb(); // Replace with your function 
@@ -224,6 +229,24 @@ void process_line( char *test_case )
 		}
 		else{
 			sprintf(info,"update_course returned status %d",status);
+			TREPORT("FAIL", info);
+		}
+	}
+	else if(!strcmp(command,"DELETE") ){
+		if( !strcmp(param2,"0") )
+			expected_status = SUCCESS;
+		else
+			expected_status = FAILURE;
+
+		sscanf(param1, "%d", &course_id);
+
+		status = delete_coursedb(course_id);
+		
+		if( status == expected_status ){
+			TREPORT("PASS", "");
+		}
+		else{
+			sprintf(info,"delete_course returned status %d",status);
 			TREPORT("FAIL", info);
 		}
 	}

@@ -7,6 +7,8 @@
 #define REC_NOT_FOUND 1
 #define OPEN 1
 #define CLOSED 0
+#define DELETED 0
+#define NOT_DELETED 1
 struct Course
 {
     int course_num;
@@ -17,6 +19,8 @@ struct Course_Ndx
 {
     long int key;
     long int loc;
+    int is_deleted;
+    int old_key;
 };
 struct CoursedbInfo
 {
@@ -34,4 +38,5 @@ int open_coursedb(char* dbname);
 int store_coursedb(int key, struct Course* c);
 int get_coursedb(int course_num,struct Course* coutput);
 int update_coursedb(int course_num,struct Course* new);
+int delete_coursedb(int course_num);
 int close_coursedb();

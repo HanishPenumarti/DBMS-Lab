@@ -62,7 +62,7 @@ int store_coursedb(int key,struct Course* c)
         }
         fseek(cdb_info.dbfile,0,SEEK_END);
         long int loc = ftell(cdb_info.dbfile);
-        struct Course_Ndx temp = {key,loc};
+        struct Course_Ndx temp = {key,loc,NOT_DELETED,key};
         cdb_info.indexarr[cdb_info.rec_count] = temp;
         cdb_info.rec_count++;
         int num = key;
@@ -116,15 +116,38 @@ int update_coursedb(int course_num,struct Course* new)
     }
     return FAILURE;
 }
+int delete_coursedb(int course_num)
+{
+    if(cdb_info.status==OPEN)
+    {
+        int found = 0;
+        for(int i=0;i<cdb_info.rec_count;i++)
+        {
+            if(cdb_info.indexarr[i].key==course_num)
+            {
+                found = 1;
+                cdb_info.indexarr[i].is_deleted = DELETED;
+                cdb_info.indexarr[i].key = -1;
+            }
+        }
+        if(found) return SUCCESS;
+    }
+    return FAILURE;
+}
 int close_coursedb()
 {
-    char arr2[50];
-    strcpy(arr2,cdb_info.dbname);
-    strcat(arr2,".ndx");
-    cdb_info.indexfile = fopen(arr2,"wb");
-    fwrite(&cdb_info.rec_count,sizeof(int),1,cdb_info.indexfile);
-    fwrite(cdb_info.indexarr,sizeof(struct Course_Ndx),cdb_info.rec_count,cdb_info.indexfile);
-    fclose(cdb_info.indexfile);
-    fclose(cdb_info.dbfile);
-    cdb_info.status=CLOSED;
+    if(cdb_info.status==OPEN)
+    {
+        char arr2[50];
+        strcpy(arr2,cdb_info.dbname);
+        strcat(arr2,".ndx");
+        cdb_info.indexfile = fopen(arr2,"wb");
+        fwrite(&cdb_info.rec_count,sizeof(int),1,cdb_info.indexfile);
+        fwrite(cdb_info.indexarr,sizeof(struct Course_Ndx),cdb_info.rec_count,cdb_info.indexfile);
+        fclose(cdb_info.indexfile);
+        fclose(cdb_info.dbfile);
+        cdb_info.status=CLOSED;
+        return SUCCESS;
+    }
+    return FAILURE;
 }
