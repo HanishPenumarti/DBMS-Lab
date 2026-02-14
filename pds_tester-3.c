@@ -2,7 +2,8 @@
 #include<stdlib.h>
 #include<string.h>
 
-#include "coursedb.h" // Modify this if your filename is different
+#include "pds.h" // Modify this if your filename is different
+#include "course.h"
 
 #define TREPORT(a1,a2) printf("Status: %s - %s\n\n", a1, a2); fflush(stdout);
 
@@ -39,37 +40,37 @@ void set_course_instructor(Course* course, char* instructor)
 // PDS function calls
 int pds_create(char* repo_name)
 {
-	return create_coursedb(repo_name); // Replace with your function 
+	return create_db(repo_name); // Replace with your function 
 }
 
-int pds_open(char* repo_name)
+int pds_open(char* repo_name,int rec_size)
 {
-	return open_coursedb(repo_name); // Replace with your function 
+	return open_db(repo_name,rec_size); // Replace with your function 
 }
 
 int add_course(int key, Course* course)
 {
-	return store_coursedb(key, course); // Replace with your function 
+	return store_db(key, course); // Replace with your function 
 }
 
 int search_course(int key, Course* course)
 {
-	return get_coursedb(key, course); // Replace with your function 
+	return get_db(key, course); // Replace with your function 
 }
 
 int update_course(int key, Course* course)
 {
-	return update_coursedb(key, course); // Replace with your function 
+	return update_db(key, course); // Replace with your function 
 }
 
 int delete_course(int key)
 {
-	return delete_coursedb(key); // Replace with your function 
+	return delete_db(key); // Replace with your function 
 }
 
 int pds_close()
 {
-	return close_coursedb(); // Replace with your function 
+	return close_db(); // Replace with your function 
 }
 
 
@@ -129,7 +130,7 @@ void process_line( char *test_case )
 		else
 			expected_status = FAILURE;
 
-		status = pds_open(dbname) ;
+		status = pds_open(dbname,sizeof(struct Course)) ;
 	
 		if( status == expected_status ){
 			TREPORT("PASS", "");
@@ -240,7 +241,7 @@ void process_line( char *test_case )
 
 		sscanf(param1, "%d", &course_id);
 
-		status = delete_coursedb(course_id);
+		status = delete_db(course_id);
 		
 		if( status == expected_status ){
 			TREPORT("PASS", "");
