@@ -13,6 +13,7 @@ void db_init()
 }
 int create_db(char * dbname)
 {
+    db_init();
     char arr1[50];
     strcpy(arr1,dbname);
     char arr2[50];
@@ -34,6 +35,7 @@ int create_db(char * dbname)
 }
 int open_db(char* dbname, int rec_size)
 {
+    if(!strcmp(cdb_info.dbname,"")) return FAILURE;
     char arr1[50];
     strcpy(arr1,dbname);
     char arr2[50];

@@ -3,7 +3,6 @@
 #include<string.h>
 
 #include "pds.h" // Modify this if your filename is different
-struct dbInfo db_info;
 
 typedef struct Hospital {
 	int hospital_id;
